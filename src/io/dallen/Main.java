@@ -5,7 +5,7 @@ import java.util.*;
 
 public class Main {
 
-    private static final int TEST_SIZE = 20000;
+    private static final int TEST_SIZE =  50 * 1000;
 
     private static final String ipfile = "sampleips.txt";
 
@@ -14,24 +14,27 @@ public class Main {
     public static void main(String[] args) throws Exception {
 //        createIPFile(ipfile, TEST_SIZE * 2);
 
-        StringBlacklist stringBlacklist = new StringBlacklist(TEST_SIZE);
-        runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
-
-        IntegerBlacklist integerBlacklist = new IntegerBlacklist(TEST_SIZE);
-        runSpeedTest("Simple Integer Blacklist", integerBlacklist, ipfile);
-
-        IntegerTreeBlacklist integerTreeBlacklist = new IntegerTreeBlacklist();
-        runSpeedTest("Integer Tree Blacklist", integerTreeBlacklist, ipfile);
+//        StringBlacklist stringBlacklist = new StringBlacklist(TEST_SIZE);
+//        runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
+//
+//        IntegerBlacklist integerBlacklist = new IntegerBlacklist(TEST_SIZE);
+//        runSpeedTest("Simple Integer Blacklist", integerBlacklist, ipfile);
+//
+//        IntegerTreeBlacklist integerTreeBlacklist = new IntegerTreeBlacklist();
+//        runSpeedTest("Integer Tree Blacklist", integerTreeBlacklist, ipfile);
 
         IntegerLinearTreeBlacklist integerLinearTreeBlacklist = new IntegerLinearTreeBlacklist();
         runSpeedTest("Integer Linear Tree Blacklist", integerLinearTreeBlacklist, ipfile);
 
-        new Scanner(System.in).nextLine();
+        PrimitiveIntegerHashBlacklist primativeIntegeHashBlacklist = new PrimitiveIntegerHashBlacklist(TEST_SIZE);
+        runSpeedTest("Primitive int HashSet Blacklist", primativeIntegeHashBlacklist, ipfile);
 
-        System.out.println("Integer Linear Tree BlackList size: " + String.valueOf(integerLinearTreeBlacklist.size()));
-        System.out.println("Integer Tree BlackList size: " + String.valueOf(integerTreeBlacklist.size()));
-        System.out.println("Integer BlackList size: " + String.valueOf(integerBlacklist.size()));
-        System.out.println("String BlackList size: " + String.valueOf(stringBlacklist.size()));
+        new Scanner(System.in).nextLine();
+//
+//        System.out.println("Integer Linear Tree BlackList size: " + String.valueOf(integerLinearTreeBlacklist.size()));
+//        System.out.println("Integer Tree BlackList size: " + String.valueOf(integerTreeBlacklist.size()));
+//        System.out.println("Integer BlackList size: " + String.valueOf(integerBlacklist.size()));
+//        System.out.println("String BlackList size: " + String.valueOf(stringBlacklist.size()));
     }
 
     static void createIPFile(String name, int number) {
