@@ -5,7 +5,7 @@ import java.util.*;
 
 public class Main {
 
-    private static final int TEST_SIZE =  50 * 1000;
+    private static final int TEST_SIZE =  8 * 1000 * 1000;
 
     private static final String ipfile = "sampleips.txt";
 
@@ -13,6 +13,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 //        createIPFile(ipfile, TEST_SIZE * 2);
+//        System.out.println("Built ip file, " + TEST_SIZE * 2 + " unique IPs created");
 
 //        StringBlacklist stringBlacklist = new StringBlacklist(TEST_SIZE);
 //        runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
@@ -23,12 +24,12 @@ public class Main {
 //        IntegerTreeBlacklist integerTreeBlacklist = new IntegerTreeBlacklist();
 //        runSpeedTest("Integer Tree Blacklist", integerTreeBlacklist, ipfile);
 
-        IntegerLinearTreeBlacklist integerLinearTreeBlacklist = new IntegerLinearTreeBlacklist();
-        runSpeedTest("Integer Linear Tree Blacklist", integerLinearTreeBlacklist, ipfile);
+//        IntegerLinearTreeBlacklist integerLinearTreeBlacklist = new IntegerLinearTreeBlacklist();
+//        runSpeedTest("Integer Linear Tree Blacklist", integerLinearTreeBlacklist, ipfile);
 
-        PrimitiveIntegerHashBlacklist primativeIntegeHashBlacklist = new PrimitiveIntegerHashBlacklist(TEST_SIZE);
-        runSpeedTest("Primitive int HashSet Blacklist", primativeIntegeHashBlacklist, ipfile);
-
+        PrimitiveIntegerHashBlacklist primitiveIntegeHashBlacklist = new PrimitiveIntegerHashBlacklist(TEST_SIZE);
+        runSpeedTest("Primitive int HashSet Blacklist", primitiveIntegeHashBlacklist, ipfile);
+//
         new Scanner(System.in).nextLine();
 //
 //        System.out.println("Integer Linear Tree BlackList size: " + String.valueOf(integerLinearTreeBlacklist.size()));
@@ -56,24 +57,38 @@ public class Main {
         long beforeTime = System.nanoTime();
 
         for (int i = 0; i < TEST_SIZE; i++) {
+            double done = (double) i / (double) TEST_SIZE * 100d;
+            if(done % 10 == 0) {
+                System.out.print(done + "%...");
+            }
             list.addIP(ipScanner.nextLine());
         }
+        System.out.println();
 
         double insertBreak = System.nanoTime();
 
         ipScanner =  new Scanner(new File(ips));
 
         for (int i = 0; i < TEST_SIZE; i++) {
+            double done = (double) i / (double) (TEST_SIZE * 2) * 100d;
+            if(done % 10 == 0) {
+                System.out.print(done + "%...");
+            }
             if(!list.blocked(ipScanner.nextLine())) {
                 System.err.println("IP on list not blocked");
             }
         }
 
         for (int i = TEST_SIZE; i < TEST_SIZE * 2; i++) {
+            double done = (double) i / (double) (TEST_SIZE * 2) * 100d;
+            if(done % 10 == 0) {
+                System.out.print(done + "%...");
+            }
             if(list.blocked(ipScanner.nextLine())) {
                 System.err.println("IP not on list not blocked");
             }
         }
+        System.out.println();
 
         double testBreak = System.nanoTime();
 
@@ -108,9 +123,9 @@ public class Main {
     static String generateRandomIpv4() {
         Random ipGenerator = new Random();
 
-        return Integer.toString(ipGenerator.nextInt(256)) + "." +
-                Integer.toString(ipGenerator.nextInt(256)) + "." +
-                Integer.toString(ipGenerator.nextInt(256)) + "." +
-                Integer.toString(ipGenerator.nextInt(256));
+        return Integer.toString(ipGenerator.nextInt(254) + 1) + "." +
+                Integer.toString(ipGenerator.nextInt(254) + 1) + "." +
+                Integer.toString(ipGenerator.nextInt(254) + 1) + "." +
+                Integer.toString(ipGenerator.nextInt(254) + 1);
     }
 }
