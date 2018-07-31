@@ -15,8 +15,8 @@ public class Main {
 //        createIPFile(ipfile, TEST_SIZE * 2);
 //        System.out.println("Built ip file, " + TEST_SIZE * 2 + " unique IPs created");
 
-//        StringBlacklist stringBlacklist = new StringBlacklist(TEST_SIZE);
-//        runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
+        StringBlacklist stringBlacklist = new StringBlacklist(TEST_SIZE);
+        runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
 //
 //        IntegerBlacklist integerBlacklist = new IntegerBlacklist(TEST_SIZE);
 //        runSpeedTest("Simple Integer Blacklist", integerBlacklist, ipfile);
@@ -27,8 +27,8 @@ public class Main {
 //        IntegerLinearTreeBlacklist integerLinearTreeBlacklist = new IntegerLinearTreeBlacklist();
 //        runSpeedTest("Integer Linear Tree Blacklist", integerLinearTreeBlacklist, ipfile);
 
-        PrimitiveIntegerHashBlacklist primitiveIntegeHashBlacklist = new PrimitiveIntegerHashBlacklist(TEST_SIZE);
-        runSpeedTest("Primitive int HashSet Blacklist", primitiveIntegeHashBlacklist, ipfile);
+        PrimitiveIntegerHashBlacklist primitiveIntegerHashBlacklist = new PrimitiveIntegerHashBlacklist(TEST_SIZE);
+        runSpeedTest("Primitive int HashSet Blacklist", primitiveIntegerHashBlacklist, ipfile);
 //
         new Scanner(System.in).nextLine();
 //
@@ -79,6 +79,9 @@ public class Main {
             }
         }
 
+        double blockedBreak = System.nanoTime();
+
+
         for (int i = TEST_SIZE; i < TEST_SIZE * 2; i++) {
             double done = (double) i / (double) (TEST_SIZE * 2) * 100d;
             if(done % 10 == 0) {
@@ -90,7 +93,7 @@ public class Main {
         }
         System.out.println();
 
-        double testBreak = System.nanoTime();
+        double notBlockedBreak = System.nanoTime();
 
 //        ipScanner =  new Scanner(new File(ips));
 //
@@ -103,7 +106,8 @@ public class Main {
         System.out.println();
         System.out.println(name + ":");
         System.out.println("\tInsert Time: " + Double.toString((insertBreak - beforeTime)/(1000.0 * 1000.0)) + " ms");
-        System.out.println("\tTest Time: " + Double.toString((testBreak - insertBreak)/(1000.0 * 1000.0)) + " ms");
+        System.out.println("\tTest Time: " + Double.toString((blockedBreak - insertBreak)/(1000.0 * 1000.0)) + " ms");
+        System.out.println("\tTest Time: " + Double.toString((notBlockedBreak - blockedBreak)/(1000.0 * 1000.0)) + " ms");
 //        System.out.println("\tRemove Time: " + Double.toString((removeBreak - testBreak)/(1000.0 * 1000.0)) + " ms");
         System.out.println();
     }

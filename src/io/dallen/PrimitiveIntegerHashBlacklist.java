@@ -2,19 +2,22 @@ package io.dallen;
 
 public class PrimitiveIntegerHashBlacklist implements IPBlacklist {
 
-    private static final byte EMPTY = 0;
-    private static final byte FILLED = 1;
-    private static final byte DELETED = 2;
+    private static final double INIT_SIZE_MOD = 1.3;
+
+    // The value 0 denotes a space is empty, the value -1 denotes a space is deleted
+    private final int EMPTY = 0;
+    private final int DELETED = -1;
+
+    private int maxDisplacement = 0;
+
+    private int maxSearched = 0;
 
     private int[] table;
-
-    private byte[] flags;
 
     private int load;
 
     public PrimitiveIntegerHashBlacklist(int size) {
-        table = new int[(int) (size * 1.5)];
-        flags = new byte[(int) (size * 1.5)];
+        table = new int[(int) (size * INIT_SIZE_MOD)];
     }
 
     @Override
@@ -24,9 +27,27 @@ public class PrimitiveIntegerHashBlacklist implements IPBlacklist {
             System.err.println("Out of space");
             return;
         }
-        int insertPos = Math.abs(intIp * 37) % flags.length;
-        for(;flags[insertPos] == FILLED;insertPos = (insertPos + 1) % flags.length);
-        flags[insertPos] = FILLED;
+        int defPos;
+        int insertPos = defPos = hash(intIp) % table.length;
+        for(;table[insertPos] != EMPTY;insertPos = (insertPos + 1) % table.length) {
+            // if the displacement of the inserting element is further than the displacement of the current element
+            // swap the two and continue
+            if(displacementOf(table[insertPos], insertPos) < insertPos - defPos ) {
+                // record the displacement
+                if(insertPos - defPos > maxDisplacement) {
+                    maxDisplacement = insertPos - defPos;
+                }
+                // swap the two
+                int x = table[insertPos];
+                table[insertPos] = intIp;
+                intIp = x;
+                // reset the counting and such
+                insertPos = defPos = hash(intIp) % table.length;
+            }
+        }
+        if(insertPos - defPos > maxDisplacement) {
+            maxDisplacement = insertPos - defPos;
+        }
         table[insertPos] = intIp;
         this.load++;
     }
@@ -34,12 +55,26 @@ public class PrimitiveIntegerHashBlacklist implements IPBlacklist {
     @Override
     public boolean blocked(String ip) {
         int intIp = pack(ip);
-        for(int dataPos = Math.abs(intIp * 37) % flags.length; flags[dataPos] != EMPTY; dataPos = (dataPos + 1) % flags.length) {
+        int defPos, dataPos;
+        for(dataPos = defPos = hash(intIp) % table.length;
+            table[dataPos] != EMPTY && table[dataPos] != DELETED && (dataPos-defPos) <= maxDisplacement;
+            dataPos = (dataPos + 1) % table.length) {
             if(table[dataPos] == intIp) {
                 return true;
             }
         }
+        if(dataPos - defPos > maxSearched) {
+            maxSearched = dataPos - defPos;
+        }
         return false;
+    }
+
+    private int displacementOf(int ip, int location) {
+        return location - (hash(ip) % table.length);
+    }
+
+    private int hash(int ip) {
+        return Math.abs(ip * 37);
     }
 
     @Override
