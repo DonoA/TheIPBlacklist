@@ -12,12 +12,12 @@ public class IntegerBlacklist implements IPBlacklist {
     }
 
     @Override
-    public void addIP(String ip) {
+    public void add(String ip) {
         blacklist.add(pack(ip));
     }
 
     @Override
-    public boolean blocked(String ip) {
+    public boolean contains(String ip) {
         return blacklist.contains(pack(ip));
     }
 

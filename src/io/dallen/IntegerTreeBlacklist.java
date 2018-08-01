@@ -7,7 +7,7 @@ public class IntegerTreeBlacklist implements IPBlacklist {
     private final TreeNode root = new TreeNode((byte) 0);
 
     @Override
-    public void addIP(String ip) {
+    public void add(String ip) {
         String[] bits = ip.split("\\.");
         TreeNode current = root;
         for(String s : bits) {
@@ -17,7 +17,7 @@ public class IntegerTreeBlacklist implements IPBlacklist {
     }
 
     @Override
-    public boolean blocked(String ip) {
+    public boolean contains(String ip) {
         String[] bits = ip.split("\\.");
         TreeNode current = root;
         for(String s : bits) {

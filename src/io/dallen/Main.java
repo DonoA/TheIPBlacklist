@@ -5,22 +5,20 @@ import java.util.*;
 
 public class Main {
 
-    private static final int TEST_SIZE =  8 * 1000 * 1000;
+    private static final int TEST_SIZE =  20 * 1000; // 8 * 1000 * 1000;
 
     private static final String ipfile = "sampleips.txt";
-
-    private static final Runtime runtime = Runtime.getRuntime();
 
     public static void main(String[] args) throws Exception {
 //        createIPFile(ipfile, TEST_SIZE * 2);
 //        System.out.println("Built ip file, " + TEST_SIZE * 2 + " unique IPs created");
 
-        StringBlacklist stringBlacklist = new StringBlacklist(TEST_SIZE);
-        runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
-//
+//        StringBlacklist stringBlacklist = new StringBlacklist(TEST_SIZE);
+//        runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
+
 //        IntegerBlacklist integerBlacklist = new IntegerBlacklist(TEST_SIZE);
 //        runSpeedTest("Simple Integer Blacklist", integerBlacklist, ipfile);
-//
+
 //        IntegerTreeBlacklist integerTreeBlacklist = new IntegerTreeBlacklist();
 //        runSpeedTest("Integer Tree Blacklist", integerTreeBlacklist, ipfile);
 
@@ -29,13 +27,13 @@ public class Main {
 
         PrimitiveIntegerHashBlacklist primitiveIntegerHashBlacklist = new PrimitiveIntegerHashBlacklist(TEST_SIZE);
         runSpeedTest("Primitive int HashSet Blacklist", primitiveIntegerHashBlacklist, ipfile);
-//
+
+        Integer2DHashSetBlacklist integer2DHashSetBlacklist = new Integer2DHashSetBlacklist(TEST_SIZE,
+                i -> i*37, i -> i*31);
+        runSpeedTest("2D primitive int HashSet Blacklist", integer2DHashSetBlacklist, ipfile);
+
+        // Pause so profiler can run
         new Scanner(System.in).nextLine();
-//
-//        System.out.println("Integer Linear Tree BlackList size: " + String.valueOf(integerLinearTreeBlacklist.size()));
-//        System.out.println("Integer Tree BlackList size: " + String.valueOf(integerTreeBlacklist.size()));
-//        System.out.println("Integer BlackList size: " + String.valueOf(integerBlacklist.size()));
-//        System.out.println("String BlackList size: " + String.valueOf(stringBlacklist.size()));
     }
 
     static void createIPFile(String name, int number) {
@@ -61,7 +59,7 @@ public class Main {
             if(done % 10 == 0) {
                 System.out.print(done + "%...");
             }
-            list.addIP(ipScanner.nextLine());
+            list.add(ipScanner.nextLine());
         }
         System.out.println();
 
@@ -74,7 +72,7 @@ public class Main {
             if(done % 10 == 0) {
                 System.out.print(done + "%...");
             }
-            if(!list.blocked(ipScanner.nextLine())) {
+            if(!list.contains(ipScanner.nextLine())) {
                 System.err.println("IP on list not blocked");
             }
         }
@@ -87,7 +85,7 @@ public class Main {
             if(done % 10 == 0) {
                 System.out.print(done + "%...");
             }
-            if(list.blocked(ipScanner.nextLine())) {
+            if(list.contains(ipScanner.nextLine())) {
                 System.err.println("IP not on list not blocked");
             }
         }
@@ -95,20 +93,11 @@ public class Main {
 
         double notBlockedBreak = System.nanoTime();
 
-//        ipScanner =  new Scanner(new File(ips));
-//
-//        while (ipScanner.hasNext()) {
-//            list.removeIP(ipScanner.nextLine());
-//        }
-//
-//        double removeBreak = System.nanoTime();
-
         System.out.println();
         System.out.println(name + ":");
-        System.out.println("\tInsert Time: " + Double.toString((insertBreak - beforeTime)/(1000.0 * 1000.0)) + " ms");
-        System.out.println("\tTest Time: " + Double.toString((blockedBreak - insertBreak)/(1000.0 * 1000.0)) + " ms");
-        System.out.println("\tTest Time: " + Double.toString((notBlockedBreak - blockedBreak)/(1000.0 * 1000.0)) + " ms");
-//        System.out.println("\tRemove Time: " + Double.toString((removeBreak - testBreak)/(1000.0 * 1000.0)) + " ms");
+        System.out.println("\tInsert Time:\t\t\t\t" + Double.toString((insertBreak - beforeTime)/(1000.0 * 1000.0)) + " ms");
+        System.out.println("\tTest Containing Time:\t\t" + Double.toString((blockedBreak - insertBreak)/(1000.0 * 1000.0)) + " ms");
+        System.out.println("\tTest Not Containing Time:\t" + Double.toString((notBlockedBreak - blockedBreak)/(1000.0 * 1000.0)) + " ms");
         System.out.println();
     }
 

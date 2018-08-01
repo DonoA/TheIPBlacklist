@@ -7,7 +7,7 @@ public class IntegerLinearTreeBlacklist implements IPBlacklist {
     private int[] childPos = new int[0];
 
     @Override
-    public void addIP(String ip) {
+    public void add(String ip) {
         String[] bits = ip.split("\\.");
         byte b;
         int endOfChildren = childPos.length > 0 ? childPos[0] : 0;
@@ -105,7 +105,7 @@ public class IntegerLinearTreeBlacklist implements IPBlacklist {
     }
 
     @Override
-    public boolean blocked(String ip) {
+    public boolean contains(String ip) {
         String[] bits = ip.split("\\.");
         byte b;
         int endOfChildren = childPos.length > 0 ? childPos[0] : 0;

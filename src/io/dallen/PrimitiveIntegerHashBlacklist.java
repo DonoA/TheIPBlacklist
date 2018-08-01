@@ -21,7 +21,7 @@ public class PrimitiveIntegerHashBlacklist implements IPBlacklist {
     }
 
     @Override
-    public void addIP(String ip) {
+    public void add(String ip) {
         int intIp = pack(ip);
         if(this.load + 1 >= table.length) {
             System.err.println("Out of space");
@@ -53,7 +53,7 @@ public class PrimitiveIntegerHashBlacklist implements IPBlacklist {
     }
 
     @Override
-    public boolean blocked(String ip) {
+    public boolean contains(String ip) {
         int intIp = pack(ip);
         int defPos, dataPos;
         for(dataPos = defPos = hash(intIp) % table.length;

@@ -1,7 +1,7 @@
 package io.dallen;
 
 public interface IPBlacklist {
-    void addIP(String ip);
-    boolean blocked(String ip);
+    void add(String ip);
+    boolean contains(String ip);
     int size();
 }
