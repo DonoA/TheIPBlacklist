@@ -3,9 +3,18 @@ package io.dallen;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Main {
+
+    private static Random ipGenerator = new Random();
+
+    private static Iterator<String> uniqueIps =
+            Stream.generate(() ->
+                Stream.generate(() -> Integer.toString(ipGenerator.nextInt(254) + 1)).limit(4)
+                    .collect(Collectors.joining("."))
+            ).distinct().iterator();
 
     private static final int TEST_SIZE = 20 * 1000; // 8 * 1000 * 1000;
 
@@ -39,12 +48,8 @@ public class Main {
     }
 
     static void createIPFile(String name, int number) {
-        LinkedList<String> ips = generateRandomIpv4s(number);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(name))) {
-            for (String ip : ips) {
-                writer.write(ip + "\n");
-
-            }
+            IntStream.range(0,number).forEach( i -> safeWrite(writer, uniqueIps.next() + "\n"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -103,12 +108,11 @@ public class Main {
         System.out.println();
     }
 
-    static LinkedList<String> generateRandomIpv4s(int number) {
-        Random ipGenerator = new Random();
-
-        return Stream.generate(() ->
-                Stream.generate(() -> Integer.toString(ipGenerator.nextInt(254) + 1)).limit(4)
-                    .collect(Collectors.joining("."))
-        ).distinct().limit(number).collect(Collectors.toCollection(LinkedList::new));
+    private static void safeWrite(BufferedWriter writer, String str) {
+        try {
+            writer.write(str);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
