@@ -2,10 +2,12 @@ package io.dallen;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 
-    private static final int TEST_SIZE =  20 * 1000; // 8 * 1000 * 1000;
+    private static final int TEST_SIZE = 20 * 1000; // 8 * 1000 * 1000;
 
     private static final String ipfile = "sampleips.txt";
 
@@ -29,7 +31,7 @@ public class Main {
         runSpeedTest("Primitive int HashSet Blacklist", primitiveIntegerHashBlacklist, ipfile);
 
         Integer2DHashSetBlacklist integer2DHashSetBlacklist = new Integer2DHashSetBlacklist(TEST_SIZE,
-                i -> i*37, i -> i*31);
+                i -> i * 37, i -> i * 31);
         runSpeedTest("2D primitive int HashSet Blacklist", integer2DHashSetBlacklist, ipfile);
 
         // Pause so profiler can run
@@ -38,8 +40,8 @@ public class Main {
 
     static void createIPFile(String name, int number) {
         LinkedList<String> ips = generateRandomIpv4s(number);
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(name))){
-            for(String ip : ips) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(name))) {
+            for (String ip : ips) {
                 writer.write(ip + "\n");
 
             }
@@ -56,7 +58,7 @@ public class Main {
 
         for (int i = 0; i < TEST_SIZE; i++) {
             double done = (double) i / (double) TEST_SIZE * 100d;
-            if(done % 10 == 0) {
+            if (done % 10 == 0) {
                 System.out.print(done + "%...");
             }
             list.add(ipScanner.nextLine());
@@ -65,14 +67,14 @@ public class Main {
 
         double insertBreak = System.nanoTime();
 
-        ipScanner =  new Scanner(new File(ips));
+        ipScanner = new Scanner(new File(ips));
 
         for (int i = 0; i < TEST_SIZE; i++) {
             double done = (double) i / (double) (TEST_SIZE * 2) * 100d;
-            if(done % 10 == 0) {
+            if (done % 10 == 0) {
                 System.out.print(done + "%...");
             }
-            if(!list.contains(ipScanner.nextLine())) {
+            if (!list.contains(ipScanner.nextLine())) {
                 System.err.println("IP on list not blocked");
             }
         }
@@ -82,10 +84,10 @@ public class Main {
 
         for (int i = TEST_SIZE; i < TEST_SIZE * 2; i++) {
             double done = (double) i / (double) (TEST_SIZE * 2) * 100d;
-            if(done % 10 == 0) {
+            if (done % 10 == 0) {
                 System.out.print(done + "%...");
             }
-            if(list.contains(ipScanner.nextLine())) {
+            if (list.contains(ipScanner.nextLine())) {
                 System.err.println("IP not on list not blocked");
             }
         }
@@ -95,30 +97,18 @@ public class Main {
 
         System.out.println();
         System.out.println(name + ":");
-        System.out.println("\tInsert Time:\t\t\t\t" + Double.toString((insertBreak - beforeTime)/(1000.0 * 1000.0)) + " ms");
-        System.out.println("\tTest Containing Time:\t\t" + Double.toString((blockedBreak - insertBreak)/(1000.0 * 1000.0)) + " ms");
-        System.out.println("\tTest Not Containing Time:\t" + Double.toString((notBlockedBreak - blockedBreak)/(1000.0 * 1000.0)) + " ms");
+        System.out.println("\tInsert Time:\t\t\t\t" + Double.toString((insertBreak - beforeTime) / (1000.0 * 1000.0)) + " ms");
+        System.out.println("\tTest Containing Time:\t\t" + Double.toString((blockedBreak - insertBreak) / (1000.0 * 1000.0)) + " ms");
+        System.out.println("\tTest Not Containing Time:\t" + Double.toString((notBlockedBreak - blockedBreak) / (1000.0 * 1000.0)) + " ms");
         System.out.println();
     }
 
     static LinkedList<String> generateRandomIpv4s(int number) {
-        Set<String> ips = new HashSet<>();
-        for(int i = 0; i < number; i++) {
-            String ip;
-            do {
-                ip = generateRandomIpv4();
-            } while (ips.contains(ip));
-            ips.add(ip);
-        }
-        return new LinkedList<String>(ips);
-    }
-
-    static String generateRandomIpv4() {
         Random ipGenerator = new Random();
 
-        return Integer.toString(ipGenerator.nextInt(254) + 1) + "." +
-                Integer.toString(ipGenerator.nextInt(254) + 1) + "." +
-                Integer.toString(ipGenerator.nextInt(254) + 1) + "." +
-                Integer.toString(ipGenerator.nextInt(254) + 1);
+        return Stream.generate(() ->
+                Stream.generate(() -> Integer.toString(ipGenerator.nextInt(254) + 1)).limit(4)
+                    .collect(Collectors.joining("."))
+        ).distinct().limit(number).collect(Collectors.toCollection(LinkedList::new));
     }
 }
