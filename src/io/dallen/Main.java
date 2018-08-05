@@ -28,12 +28,12 @@ public class Main {
             System.out.println("Built ip file, " + testSize * 2 + " unique IPs created");
         }
 
-        StringBlacklist stringBlacklist;
-        IntegerBlacklist integerBlacklist;
-        IntegerTreeBlacklist integerTreeBlacklist;
-        IntegerLinearTreeBlacklist integerLinearTreeBlacklist;
-        PrimitiveIntegerHashBlacklist primitiveIntegerHashBlacklist;
-        Integer2DHashSetBlacklist integer2DHashSetBlacklist;
+        StringBlacklist stringBlacklist = null;
+        IntegerBlacklist integerBlacklist = null;
+        IntegerTreeBlacklist integerTreeBlacklist = null;
+        IntegerLinearTreeBlacklist integerLinearTreeBlacklist = null;
+        PrimitiveIntegerHashBlacklist primitiveIntegerHashBlacklist = null;
+        Integer2DHashSetBlacklist integer2DHashSetBlacklist = null;
 
         if(System.getenv("STRING_BLACKLIST") != null){
             stringBlacklist = new StringBlacklist(testSize);
