@@ -16,34 +16,51 @@ public class Main {
                     .collect(Collectors.joining("."))
             ).distinct().iterator();
 
-    private static final int TEST_SIZE = 20 * 1000; // 8 * 1000 * 1000;
-
     private static final String ipfile = "sampleips.txt";
 
+    private static int testSize;
+
     public static void main(String[] args) throws Exception {
-//        createIPFile(ipfile, TEST_SIZE * 2);
-//        System.out.println("Built ip file, " + TEST_SIZE * 2 + " unique IPs created");
+        testSize = Integer.parseInt(System.getenv("TEST_COUNT"));
 
-//        StringBlacklist stringBlacklist = new StringBlacklist(TEST_SIZE);
-//        runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
+        if(System.getenv("BUILD_TEST") != null){
+            createIPFile(ipfile, testSize * 2);
+            System.out.println("Built ip file, " + testSize * 2 + " unique IPs created");
+        }
 
-//        IntegerBlacklist integerBlacklist = new IntegerBlacklist(TEST_SIZE);
-//        runSpeedTest("Simple Integer Blacklist", integerBlacklist, ipfile);
+        if(System.getenv("STRING_BLACKLIST") != null){
+            StringBlacklist stringBlacklist = new StringBlacklist(testSize);
+            runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
+        }
 
-//        IntegerTreeBlacklist integerTreeBlacklist = new IntegerTreeBlacklist();
-//        runSpeedTest("Integer Tree Blacklist", integerTreeBlacklist, ipfile);
+        if(System.getenv("INTEGER_BLACKLIST") != null){
+            IntegerBlacklist integerBlacklist = new IntegerBlacklist(testSize);
+            runSpeedTest("Simple Integer Blacklist", integerBlacklist, ipfile);
+        }
 
-//        IntegerLinearTreeBlacklist integerLinearTreeBlacklist = new IntegerLinearTreeBlacklist();
-//        runSpeedTest("Integer Linear Tree Blacklist", integerLinearTreeBlacklist, ipfile);
+        if(System.getenv("INTEGER_TREE_BLACKLIST") != null){
+            IntegerTreeBlacklist integerTreeBlacklist = new IntegerTreeBlacklist();
+            runSpeedTest("Integer Tree Blacklist", integerTreeBlacklist, ipfile);
+        }
 
-        PrimitiveIntegerHashBlacklist primitiveIntegerHashBlacklist = new PrimitiveIntegerHashBlacklist(TEST_SIZE);
-        runSpeedTest("Primitive int HashSet Blacklist", primitiveIntegerHashBlacklist, ipfile);
+        if(System.getenv("INTEGER_TREE_BLACKLIST") != null){
+            IntegerLinearTreeBlacklist integerLinearTreeBlacklist = new IntegerLinearTreeBlacklist();
+            runSpeedTest("Integer Linear Tree Blacklist", integerLinearTreeBlacklist, ipfile);
+        }
 
-        Integer2DHashSetBlacklist integer2DHashSetBlacklist = new Integer2DHashSetBlacklist(TEST_SIZE,
-                i -> i * 37, i -> i * 31);
-        runSpeedTest("2D primitive int HashSet Blacklist", integer2DHashSetBlacklist, ipfile);
+        if(System.getenv("PRIMITVE_INT_HASHSET") != null){
+            PrimitiveIntegerHashBlacklist primitiveIntegerHashBlacklist = new PrimitiveIntegerHashBlacklist(testSize);
+            runSpeedTest("Primitive int HashSet Blacklist", primitiveIntegerHashBlacklist, ipfile);
+        }
+
+        if(System.getenv("INTEGER_TREE_BLACKLIST") != null){
+            Integer2DHashSetBlacklist integer2DHashSetBlacklist = new Integer2DHashSetBlacklist(testSize,
+                    i -> i * 37, i -> i * 31);
+            runSpeedTest("2D primitive int HashSet Blacklist", integer2DHashSetBlacklist, ipfile);
+        }
 
         // Pause so profiler can run
+        System.out.println("Press enter to complete");
         new Scanner(System.in).nextLine();
     }
 
@@ -61,8 +78,8 @@ public class Main {
 
         long beforeTime = System.nanoTime();
 
-        for (int i = 0; i < TEST_SIZE; i++) {
-            double done = (double) i / (double) TEST_SIZE * 100d;
+        for (int i = 0; i < testSize; i++) {
+            double done = (double) i / (double) testSize * 100d;
             if (done % 10 == 0) {
                 System.out.print(done + "%...");
             }
@@ -74,8 +91,8 @@ public class Main {
 
         ipScanner = new Scanner(new File(ips));
 
-        for (int i = 0; i < TEST_SIZE; i++) {
-            double done = (double) i / (double) (TEST_SIZE * 2) * 100d;
+        for (int i = 0; i < testSize; i++) {
+            double done = (double) i / (double) (testSize * 2) * 100d;
             if (done % 10 == 0) {
                 System.out.print(done + "%...");
             }
@@ -87,8 +104,8 @@ public class Main {
         double blockedBreak = System.nanoTime();
 
 
-        for (int i = TEST_SIZE; i < TEST_SIZE * 2; i++) {
-            double done = (double) i / (double) (TEST_SIZE * 2) * 100d;
+        for (int i = testSize; i < testSize * 2; i++) {
+            double done = (double) i / (double) (testSize * 2) * 100d;
             if (done % 10 == 0) {
                 System.out.print(done + "%...");
             }
