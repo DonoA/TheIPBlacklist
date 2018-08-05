@@ -50,7 +50,7 @@ public class Main {
             runSpeedTest("Integer Tree Blacklist", integerTreeBlacklist, ipfile);
         }
 
-        if(System.getenv("INTEGER_TREE_BLACKLIST") != null){
+        if(System.getenv("INTEGER_LINEAR_TREE_BLACKLIST") != null){
             integerLinearTreeBlacklist = new IntegerLinearTreeBlacklist();
             runSpeedTest("Integer Linear Tree Blacklist", integerLinearTreeBlacklist, ipfile);
         }
@@ -60,7 +60,7 @@ public class Main {
             runSpeedTest("Primitive int HashSet Blacklist", primitiveIntegerHashBlacklist, ipfile);
         }
 
-        if(System.getenv("INTEGER_TREE_BLACKLIST") != null){
+        if(System.getenv("INTEGER_2D_TREE_BLACKLIST") != null){
             integer2DHashSetBlacklist = new Integer2DHashSetBlacklist(testSize,
                     i -> i * 37, i -> i * 31);
             runSpeedTest("2D primitive int HashSet Blacklist", integer2DHashSetBlacklist, ipfile);
