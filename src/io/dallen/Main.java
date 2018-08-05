@@ -28,33 +28,40 @@ public class Main {
             System.out.println("Built ip file, " + testSize * 2 + " unique IPs created");
         }
 
+        StringBlacklist stringBlacklist;
+        IntegerBlacklist integerBlacklist;
+        IntegerTreeBlacklist integerTreeBlacklist;
+        IntegerLinearTreeBlacklist integerLinearTreeBlacklist;
+        PrimitiveIntegerHashBlacklist primitiveIntegerHashBlacklist;
+        Integer2DHashSetBlacklist integer2DHashSetBlacklist;
+
         if(System.getenv("STRING_BLACKLIST") != null){
-            StringBlacklist stringBlacklist = new StringBlacklist(testSize);
+            stringBlacklist = new StringBlacklist(testSize);
             runSpeedTest("Simple String Blacklist", stringBlacklist, ipfile);
         }
 
         if(System.getenv("INTEGER_BLACKLIST") != null){
-            IntegerBlacklist integerBlacklist = new IntegerBlacklist(testSize);
+            integerBlacklist = new IntegerBlacklist(testSize);
             runSpeedTest("Simple Integer Blacklist", integerBlacklist, ipfile);
         }
 
         if(System.getenv("INTEGER_TREE_BLACKLIST") != null){
-            IntegerTreeBlacklist integerTreeBlacklist = new IntegerTreeBlacklist();
+            integerTreeBlacklist = new IntegerTreeBlacklist();
             runSpeedTest("Integer Tree Blacklist", integerTreeBlacklist, ipfile);
         }
 
         if(System.getenv("INTEGER_TREE_BLACKLIST") != null){
-            IntegerLinearTreeBlacklist integerLinearTreeBlacklist = new IntegerLinearTreeBlacklist();
+            integerLinearTreeBlacklist = new IntegerLinearTreeBlacklist();
             runSpeedTest("Integer Linear Tree Blacklist", integerLinearTreeBlacklist, ipfile);
         }
 
         if(System.getenv("PRIMITVE_INT_HASHSET") != null){
-            PrimitiveIntegerHashBlacklist primitiveIntegerHashBlacklist = new PrimitiveIntegerHashBlacklist(testSize);
+            primitiveIntegerHashBlacklist = new PrimitiveIntegerHashBlacklist(testSize);
             runSpeedTest("Primitive int HashSet Blacklist", primitiveIntegerHashBlacklist, ipfile);
         }
 
         if(System.getenv("INTEGER_TREE_BLACKLIST") != null){
-            Integer2DHashSetBlacklist integer2DHashSetBlacklist = new Integer2DHashSetBlacklist(testSize,
+            integer2DHashSetBlacklist = new Integer2DHashSetBlacklist(testSize,
                     i -> i * 37, i -> i * 31);
             runSpeedTest("2D primitive int HashSet Blacklist", integer2DHashSetBlacklist, ipfile);
         }
