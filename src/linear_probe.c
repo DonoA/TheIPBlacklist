@@ -1,6 +1,6 @@
 #include "blacklist.h"
-#include "allocator.h"
-#include "common.h"
+#include "lib/allocator.h"
+#include "lib/common.h"
 #include <assert.h>
 
 #define EMPTY 0

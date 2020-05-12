@@ -1,6 +1,6 @@
 #include "subnet_loader.h"
 
-#include "blacklist.h"
+#include "../blacklist.h"
 
 #include <stdio.h>
 #include <stdlib.h>

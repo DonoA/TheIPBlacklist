@@ -4,11 +4,11 @@
 #include <stdbool.h>
 #include <time.h>
 
-#include "vector.h"
-#include "fast_rand.h"
-#include "common.h"
-#include "allocator.h"
-#include "subnet_loader.h"
+#include "lib/vector.h"
+#include "lib/fast_rand.h"
+#include "lib/common.h"
+#include "lib/allocator.h"
+#include "lib/subnet_loader.h"
 
 #include "blacklist.h"
 
