@@ -1,5 +1,1 @@
-out/
-.idea/
-projects.iml
-sampleips.txt
-TheIPBlacklist.iml
+*_test

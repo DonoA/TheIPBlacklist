@@ -16,9 +16,9 @@ struct set_struct
 set_t *newSet(size_t len)
 {
     set_t *set = profiledCalloc(1, sizeof(set_t));
-    set->table_len = len + 1;
+    set->table_len = len * 1.3;
     set->table_used = 0;
-    set->table = profiledCalloc(len, sizeof(uint32_t));
+    set->table = profiledCalloc(set->table_len, sizeof(uint32_t));
 
     return set;
 }
@@ -38,17 +38,28 @@ size_t hash(uint32_t x)
     x ^= x >> 15;
     x *= UINT32_C(0x846ca68b);
     x ^= x >> 16;
-    return x;
+    return x & 0xffffffff;
 }
 
 void addIP(uint32_t address, void *context)
 {
+    if(address == EMPTY)
+    {
+        return;
+    }
+
     set_t *set = (set_t *)context;
     assert(set->table_used < set->table_len);
     size_t adr_hash = hash(address);
-    while (true)
+    size_t checked = 0;
+    while (checked < set->table_len)
     {
         uint32_t *elt = set->table + (adr_hash % set->table_len);
+        if (*elt == address)
+        {
+            return;
+        }
+        
         if (*elt == DELETED || *elt == EMPTY)
         {
             *elt = address;
@@ -56,8 +67,14 @@ void addIP(uint32_t address, void *context)
             return;
         }
 
+        checked++;
         adr_hash++;
     }
+
+    char * adr = addressAsStr(address);
+    printf("Failed while adding (checked %li) %s\n", checked, adr);
+    free(adr);
+    exit(1);
 }
 
 void setAddAll(set_t *set, subnet_t addresses)
@@ -67,8 +84,14 @@ void setAddAll(set_t *set, subnet_t addresses)
 
 bool setContains(set_t *set, uint32_t address)
 {
+    if(address == EMPTY)
+    {
+        return true;
+    }
+
     size_t adr_hash = hash(address);
-    while (true)
+    size_t checked = 0;
+    while (checked < set->table_len)
     {
         uint32_t *elt = set->table + (adr_hash % set->table_len);
         if (*elt == address)
@@ -81,6 +104,17 @@ bool setContains(set_t *set, uint32_t address)
             return false;
         }
 
+        checked++;
         adr_hash++;
     }
+
+    char * adr = addressAsStr(address);
+    printf("Failed while checking (checked %li) %s\n", checked, adr);
+    free(adr);
+    exit(1);
+}
+
+size_t setGetSize(set_t * set)
+{
+    return set->table_used;
 }

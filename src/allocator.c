@@ -27,7 +27,7 @@ void profiledFree(void * ptr)
         // This is a gnu extension, check https://stackoverflow.com/a/1281720 for additional implementations
         allocator_freed += malloc_usable_size(ptr);
     }
-    return free(ptr);
+    free(ptr);
 }
 
 void endProfiling(size_t * allocated_out, size_t * freed_out)
