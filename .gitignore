@@ -1,1 +1,4 @@
 *_test
+datasets/
+*.png
+.vscode/

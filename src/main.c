@@ -13,8 +13,10 @@
 #include "blacklist.h"
 
 #define HIT_RATE 2
-#define TEST_COUNT 50*1000*1000
-#define TEST_SIZE 10*1000
+// #define TEST_COUNT 50 * 1000 * 1000
+#define TEST_COUNT 50
+// #define TEST_SIZE 10 * 1000
+#define TEST_SIZE 10
 #define DEBUG true
 
 size_t countIPs(vector_t *subnet_vector)
@@ -32,7 +34,7 @@ size_t countIPs(vector_t *subnet_vector)
 void runTest()
 {
     set_t *blocklist = newSet(TEST_SIZE);
-    
+
     size_t r = 1;
     for (size_t i = 0; i < TEST_SIZE; i++)
     {
@@ -48,7 +50,7 @@ void runTest()
 
     for (size_t i = 0; i < TEST_COUNT; i++)
     {
-        if((i * 2) % TEST_SIZE == 0)
+        if ((i * 2) % TEST_SIZE == 0)
         {
             r = 1;
         }
@@ -56,7 +58,7 @@ void runTest()
         uint32_t address;
         bool hit = i % HIT_RATE == 0;
 
-        if(hit)
+        if (hit)
         {
             r = (r * 12345);
             address = (r | 0x11111111) & 0xff00ff00;
@@ -81,7 +83,7 @@ void runTest()
     printf("[PASSED] TEST_COUNT = %u, HIT_RATE = %u, IPs = %u\n", TEST_COUNT, HIT_RATE, TEST_SIZE);
 }
 
-void runProfiling(size_t totalIPs, vector_t * subnet_vector)
+void runProfiling(size_t totalIPs, vector_t *subnet_vector)
 {
     clock_t start, stop;
     beingMemoryProfiling();
@@ -136,6 +138,12 @@ void runProfiling(size_t totalIPs, vector_t * subnet_vector)
 
 int main(int argc, char *argv[])
 {
+    if (DEBUG)
+    {
+        runTest();
+        return EXIT_SUCCESS;
+    }
+
     if (argc != 2)
     {
         printf("Usage: %s <ip file>\n", argv[0]);
@@ -146,14 +154,7 @@ int main(int argc, char *argv[])
     parseFile(subnet_vector, argv[1]);
     size_t totalIPs = countIPs(subnet_vector);
 
-    if(DEBUG)
-    {
-        runTest();
-    }
-    else
-    {
-        runProfiling(totalIPs, subnet_vector);
-    }
+    runProfiling(totalIPs, subnet_vector);
 
     deleteVector(subnet_vector);
 
