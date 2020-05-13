@@ -10,5 +10,8 @@ bitset_test: main.c bitset.c $(LIB)
 robinhood_test: main.c robinhood_hashing.c $(LIB)
 	gcc $(CFLAGS) -o $@ $^
 
+EBVBL_test: main.c EBVBL.c $(LIB)
+	gcc $(CFLAGS) -o $@ $^
+
 clean:
 	-rm *_test

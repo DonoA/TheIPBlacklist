@@ -1,13 +1,21 @@
 #include "blacklist.h"
+
 #include "lib/allocator.h"
 #include "lib/common.h"
-#include <assert.h>
 
 #define EMPTY 0
-#define DELETED 255
+
+#define BLOCK_LEN 8
+#define SIG_BITS 28
+#define INSIG_BITS (32-SIG_BITS)
+#define MASK ((1L << SIG_BITS) - 1)
+#define INSIG_MASK ((1L << INSIG_BITS) - 1)
 
 struct set_struct
 {
+    uint8_t *bloom_filter;
+    size_t size;
+
     uint32_t *table;
     size_t table_len;
     size_t table_used;
@@ -20,20 +28,15 @@ struct set_struct
 set_t *newSet(size_t len)
 {
     set_t *set = profiledCalloc(1, sizeof(set_t));
+    set->bloom_filter = profiledCalloc(MASK / BLOCK_LEN, sizeof(uint8_t));
     set->table_len = len * 1.3;
-    set->table_used = 0;
     set->table = profiledCalloc(set->table_len, sizeof(uint32_t));
-
-    set->total_search_dist = 0;
-    set->search_count = 0;
-    set->search_over_cache_line = 0;
-
     return set;
 }
 
 void deleteSet(set_t *set)
 {
-    profiledFree(set->table);
+    profiledFree(set->bloom_filter);
     profiledFree(set);
 }
 
@@ -51,13 +54,20 @@ size_t hash(uint32_t x)
 
 void addIP(uint32_t address, void *context)
 {
-    if(address == EMPTY)
+    set_t *set = (set_t *)context;
+
+    // set bloom filter entry
+    uint32_t masked_address = address >> INSIG_BITS;
+    size_t offset = masked_address / BLOCK_LEN;
+    uint8_t *seg = set->bloom_filter + offset;
+    size_t mask = 1 << (masked_address % BLOCK_LEN);
+    if ((*seg & mask) == 0)
     {
-        return;
+        set->size++;
+        *seg |= mask;
     }
 
-    set_t *set = (set_t *)context;
-    assert(set->table_used < set->table_len);
+    // set backing table entry
     size_t adr_hash = hash(address);
     size_t checked = 0;
     while (checked < set->table_len)
@@ -68,7 +78,7 @@ void addIP(uint32_t address, void *context)
             return;
         }
         
-        if (*elt == DELETED || *elt == EMPTY)
+        if (*elt == EMPTY)
         {
             *elt = address;
             set->table_used++;
@@ -97,7 +107,17 @@ bool setContains(set_t *set, uint32_t address)
         return true;
     }
 
+    uint32_t masked_address = address >> INSIG_BITS;
+    size_t offset = masked_address / BLOCK_LEN;
+    uint8_t *seg = set->bloom_filter + offset;
+    size_t mask = 1 << (masked_address % BLOCK_LEN);
+    if((*seg & mask) == 0)
+    {
+        return false;
+    }
+
     set->search_count++;
+
     size_t adr_hash = hash(address);
     size_t checked = 0;
     while (checked < set->table_len)
@@ -129,9 +149,9 @@ bool setContains(set_t *set, uint32_t address)
     exit(1);
 }
 
-size_t setGetSize(set_t * set)
+size_t setGetSize(set_t *set)
 {
-    return set->table_used;
+    return set->size;
 }
 
 void setPrintExtraStats(set_t * set)

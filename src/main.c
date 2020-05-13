@@ -34,7 +34,6 @@ size_t countIPs(vector_t *subnet_vector)
 void runTest()
 {
     set_t *blocklist = newSet(TEST_SIZE);
-
     size_t r = 1;
     for (size_t i = 0; i < TEST_SIZE; i++)
     {
@@ -79,8 +78,9 @@ void runTest()
             exit(EXIT_FAILURE);
         }
     }
-
     printf("[PASSED] TEST_COUNT = %u, HIT_RATE = %u, IPs = %u\n", TEST_COUNT, HIT_RATE, TEST_SIZE);
+
+    setPrintExtraStats(blocklist);
 }
 
 void runProfiling(size_t totalIPs, vector_t *subnet_vector)
@@ -133,12 +133,14 @@ void runProfiling(size_t totalIPs, vector_t *subnet_vector)
     printf("[PASSED] allocated (Bytes) = %lu, freed (Bytes) = %lu, set size = %lu\n", allocated, freed, setGetSize(blocklist));
     printf("[PASSED] setup time = %f (s), test_time = %f (s)\n", setup_time, test_time);
 
+    setPrintExtraStats(blocklist);
+
     deleteSet(blocklist);
 }
 
 int main(int argc, char *argv[])
 {
-    if (DEBUG)
+    if (argc == 1)
     {
         runTest();
         return EXIT_SUCCESS;

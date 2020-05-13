@@ -12,6 +12,10 @@ struct set_struct
     size_t table_len;
     size_t table_used;
     size_t max_dist;
+
+    size_t total_search_dist;
+    size_t search_count;
+    size_t search_over_cache_line;
 };
 
 set_t *newSet(size_t len)
@@ -21,6 +25,10 @@ set_t *newSet(size_t len)
     set->table_used = 0;
     set->table = profiledCalloc(set->table_len, sizeof(uint32_t));
     set->max_dist = 0;
+
+    set->total_search_dist = 0;
+    set->search_count = 0;
+    set->search_over_cache_line = 0;
 
     return set;
 }
@@ -109,11 +117,22 @@ bool setContains(set_t *set, uint32_t address)
         return true;
     }
 
+    set->search_count++;
+    size_t searched = 0;
+    set->search_over_cache_line++;
+
     int def_pos, data_pos;
     for (data_pos = def_pos = hash(address) % set->table_len;
         set->table[data_pos] != EMPTY && set->table[data_pos] != DELETED && (data_pos - def_pos) <= set->max_dist;
         data_pos = (data_pos + 1) % set->table_len)
     {
+        if(searched % 16 == 0 && searched != 0)
+        {
+            set->search_over_cache_line++;
+        }
+        set->total_search_dist++;
+        searched++;
+
         if (set->table[data_pos] == address)
         {
             return true;
@@ -126,4 +145,10 @@ bool setContains(set_t *set, uint32_t address)
 size_t setGetSize(set_t *set)
 {
     return set->table_used;
+}
+
+void setPrintExtraStats(set_t * set)
+{
+    printf("Average Search Dist = %f\n", ((double) set->total_search_dist/set->search_count));
+    printf("Searches over 16 elts = %lu\n", set->search_over_cache_line - set->search_count);
 }
