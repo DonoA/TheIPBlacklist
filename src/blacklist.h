@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define LOAD_FACTOR_MOD 0.1
+#define EXPAND_FACTOR_MOD 1.1
+
 typedef struct {
     uint32_t address;
     uint8_t sig_bits;

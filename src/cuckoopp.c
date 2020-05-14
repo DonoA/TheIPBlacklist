@@ -19,7 +19,11 @@ struct set_struct
     table_bucket_t *table;
     size_t table_len;
     size_t insert_loops;
+
     size_t expansions;
+    size_t bloom_filter_misses;
+    size_t second_bucket_hits;
+    size_t second_bucket_queries;
 };
 
 set_t *newSet(size_t len)
@@ -45,7 +49,7 @@ void expand(set_t *set)
     table_bucket_t *old_buckets = set->table;
     size_t old_table_len = set->table_len;
 
-    set->table_len = (set->table_len * 1.01) + 1;
+    set->table_len = (set->table_len * EXPAND_FACTOR_MOD) + 1;
     set->insert_loops = 0;
     set->table = profiledCalloc(set->table_len, sizeof(table_bucket_t));
     set->expansions++;
@@ -68,7 +72,7 @@ void expand(set_t *set)
 
 // Seems to be pretty good
 // https://github.com/skeeto/hash-prospector
-uint32_t hash1(uint32_t x)
+static inline uint32_t hash1(uint32_t x)
 {
     x ^= x >> 16;
     x *= UINT32_C(0x7feb352d);
@@ -79,7 +83,7 @@ uint32_t hash1(uint32_t x)
 }
 
 // Second hash functions also from the prospector
-uint32_t hash2(uint32_t x)
+static inline uint32_t hash2(uint32_t x)
 {
     x ^= x >> 17;
     x *= UINT32_C(0xed5ad4bb);
@@ -187,15 +191,18 @@ bool setContains(set_t *set, uint32_t address)
     uint64_t mask = (1 << (adr_hash2 % 64));
     if ((bucket->filter & mask) == 0)
     {
+        set->bloom_filter_misses++;
         return false;
     }
 
+    set->second_bucket_queries++;
     // check secondary bucket
     bucket = set->table + (adr_hash2 % set->table_len);
     for (size_t i = 0; i < BUCKET_SIZE; i++)
     {
         if (bucket->data[i] == address)
         {
+            set->second_bucket_hits++;
             return true;
         }
 
@@ -217,16 +224,24 @@ size_t setGetSize(set_t *set)
         {
             if (set->table[i].data[j] != EMPTY)
             {
+                // putchar('#');
                 size++;
+            }
+            else
+            {
+                // putchar('-');
             }
         }
     }
+    // putchar('\n');
     return size;
 }
 
 void setPrintExtraStats(set_t *set)
 {
-    size_t size = setGetSize(set);    
+    size_t size = setGetSize(set);
 
     printf("Expansions = %lu, load factor = %f\n", set->expansions, (float)size / (set->table_len * BUCKET_SIZE));
+    printf("Second Bucket Queries = %lu, Second bucket hits = %lu\n", set->second_bucket_queries, set->second_bucket_hits);
+    printf("Bloom filter misses = %lu\n", set->bloom_filter_misses);
 }

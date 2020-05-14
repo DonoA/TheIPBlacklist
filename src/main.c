@@ -13,13 +13,14 @@
 #include "blacklist.h"
 
 #define HIT_RATE 2
-// #define TEST_COUNT 50 * 1000 * 1000
-#define TEST_COUNT 50
+#define TEST_COUNT 50 * 1000 * 1000
+// #define TEST_COUNT 50
 // #define TEST_SIZE 10 * 1000 * 1000
-#define TEST_SIZE 50
+#define TEST_SIZE 1000 * 1000
 #define DEBUG true
 
 #define TEST_IP_START 16777217 // 1.0.0.1
+#define TEST_IP_STRIDE 32 // 
 
 size_t countIPs(vector_t *subnet_vector)
 {
@@ -36,17 +37,18 @@ size_t countIPs(vector_t *subnet_vector)
 void runTest()
 {
     set_t *blocklist = newSet(TEST_SIZE/2);
-    
+
     for (size_t i = 0; i < TEST_SIZE; i++)
     {
-        if(i + TEST_IP_START > (1 << 31))
+        uint32_t address = (i*TEST_IP_STRIDE) + TEST_IP_START;
+        if(address > (1 << 31))
         {
             printf("Too many IPs!\n");
             exit(1);
         }
 
         subnet_t subnet;
-        subnet.address = i + TEST_IP_START;
+        subnet.address = address;
         subnet.sig_bits = 32;
         bool hit = i % HIT_RATE == 0;
         if(hit)
@@ -58,7 +60,7 @@ void runTest()
     for (size_t i = 0; i < TEST_SIZE; i++)
     {
         bool hit = i % HIT_RATE == 0;
-        uint32_t address = i + TEST_IP_START;
+        uint32_t address = (i*TEST_IP_STRIDE) + TEST_IP_START;
         bool blocked = setContains(blocklist, address);
 
         if (blocked != hit)
@@ -122,7 +124,7 @@ void runProfiling(size_t totalIPs, vector_t *subnet_vector)
     printf("[PASSED] TEST_COUNT = %u, HIT_RATE = %u, IPs = %lu\n", TEST_COUNT, HIT_RATE, totalIPs);
     size_t allocated, freed;
     endProfiling(&allocated, &freed);
-    printf("[PASSED] allocated (Bytes) = %lu, freed (Bytes) = %lu, set size = %lu\n", allocated, freed, setGetSize(blocklist));
+    printf("[PASSED] allocated (Bytes) = %lu, freed (Bytes) = %lu, diff = %lu (Bytes), set size = %lu\n", allocated, freed, allocated - freed, setGetSize(blocklist));
     printf("[PASSED] setup time = %f (s), test_time = %f (s)\n", setup_time, test_time);
 
     setPrintExtraStats(blocklist);

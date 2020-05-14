@@ -1,4 +1,6 @@
 #include "allocator.h"
+#include <stdint.h>
+#include <string.h>
 
 bool allocator_profiler_running = false;
 size_t allocator_allocated = 0;
@@ -17,7 +19,10 @@ void * profiledCalloc(size_t n, size_t size)
     {
         allocator_allocated += (size * n);
     }
-    return calloc(n, size);
+
+    uint8_t * space = (uint8_t *) aligned_alloc(64, n * size);
+    memset(space, 0, n * size);
+    return space;
 }
 
 void profiledFree(void * ptr)

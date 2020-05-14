@@ -1,4 +1,4 @@
-CFLAGS = -g
+CFLAGS = -g -O3
 LIB = lib/*.c
 
 linear_probe_test: main.c linear_probe.c $(LIB)
