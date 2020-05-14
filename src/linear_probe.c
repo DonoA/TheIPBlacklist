@@ -4,7 +4,6 @@
 #include <assert.h>
 
 #define EMPTY 0
-#define DELETED 255
 
 struct set_struct
 {
@@ -70,7 +69,7 @@ void addIP(uint32_t address, void *context)
             return;
         }
         
-        if (*elt == DELETED || *elt == EMPTY)
+        if (*elt == EMPTY)
         {
             *elt = address;
             set->table_used++;

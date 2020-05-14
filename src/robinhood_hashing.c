@@ -4,7 +4,6 @@
 #include <assert.h>
 
 #define EMPTY 0
-#define DELETED 255
 
 struct set_struct
 {
@@ -73,7 +72,7 @@ void addIP(uint32_t address, void *context)
     size_t ins_pos = def_pos = hash(address) % set->table_len;
     for (; set->table[ins_pos] != EMPTY; ins_pos = (ins_pos + 1) % set->table_len)
     {
-        if (set->table[ins_pos] == original_address)
+        if (set->table[ins_pos] == address)
         {
             return;
         }
@@ -125,7 +124,7 @@ bool setContains(set_t *set, uint32_t address)
 
     int def_pos, data_pos;
     for (data_pos = def_pos = hash(address) % set->table_len;
-        set->table[data_pos] != EMPTY && set->table[data_pos] != DELETED && (data_pos - def_pos) <= set->max_dist;
+        set->table[data_pos] != EMPTY && (data_pos - def_pos) <= set->max_dist;
         data_pos = (data_pos + 1) % set->table_len)
     {
         if(searched % 16 == 0 && searched != 0)

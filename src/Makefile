@@ -16,5 +16,8 @@ EBVBL_test: main.c EBVBL.c $(LIB)
 cuckoopp_test: main.c cuckoopp.c $(LIB)
 	gcc $(CFLAGS) -o $@ $^
 
+cuckoo_prefix_test: main.c cuckoo_prefix.c $(LIB)
+	gcc $(CFLAGS) -o $@ $^
+
 clean:
 	-rm *_test
