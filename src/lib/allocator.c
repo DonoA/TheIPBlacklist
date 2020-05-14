@@ -20,7 +20,7 @@ void * profiledCalloc(size_t n, size_t size)
         allocator_allocated += (size * n);
     }
 
-    uint8_t * space = (uint8_t *) aligned_alloc(64, n * size);
+    void * space = aligned_alloc(64, n * size);
     memset(space, 0, n * size);
     return space;
 }

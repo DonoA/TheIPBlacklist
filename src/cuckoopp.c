@@ -159,8 +159,8 @@ void addIP(uint32_t address, void *context)
         }
     }
 
-    printf("Buckets full, cuckoo chaining required\n");
-    exit(1);
+    expand(set);
+    addIP(address, set);
 }
 
 void setAddAll(set_t *set, subnet_t addresses)

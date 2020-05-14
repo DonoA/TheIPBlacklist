@@ -14,10 +14,10 @@
 
 // Higher is fewer hits
 #define HIT_RATE 10
-#define TEST_COUNT 50 * 1000 * 1000
+#define TEST_COUNT 100 * 1000 * 1000
 // #define TEST_COUNT 50
 // #define TEST_SIZE 10 * 1000 * 1000
-#define TEST_SIZE 1000 * 1000
+#define TEST_SIZE 10*1000 * 1000
 #define DEBUG true
 
 #define TEST_IP_START 16777217 // 1.0.0.1

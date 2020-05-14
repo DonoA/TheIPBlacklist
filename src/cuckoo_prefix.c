@@ -8,16 +8,17 @@
 
 #define BLOCK_LEN 8
 #define EMPTY 0
-#define BUCKET_SIZE 12
-#define BLOOM_FILTER_SIZE 10
+#define BUCKET_SIZE 14
+#define PACK_SIZE ((BUCKET_SIZE + 3) / 4)
+#define BLOOM_FILTER_SIZE (64 - (BUCKET_SIZE * 4 + PACK_SIZE))
 #define MAX_LOOPS 16
 #define TOP_HALF_MASK 0xfffffff0
 
 typedef struct
 {
-    uint32_t data[BUCKET_SIZE];                   // 48
-    uint8_t packed_subnet_sizes[BUCKET_SIZE / 4]; // 3 (Each subnet is 2 bits)
-    uint8_t filter[BLOOM_FILTER_SIZE];            // 13
+    uint32_t data[BUCKET_SIZE];              // 13*4 = 52
+    uint8_t packed_subnet_sizes[PACK_SIZE];  // 4 (Each subnet is 2 bits)
+    uint8_t filter[BLOOM_FILTER_SIZE];       // 8
 } table_bucket_t;
 
 struct set_struct
@@ -36,7 +37,7 @@ set_t *newSet(size_t len)
 {
     static_assert(sizeof(table_bucket_t) == 64, "Bucket size should be cache line!");
     set_t *set = profiledCalloc(1, sizeof(set_t));
-    set->table_len = ((float)(len * 0.9) / BUCKET_SIZE);
+    set->table_len = ((float)(len * 1.1) / BUCKET_SIZE);
     set->table = profiledCalloc(set->table_len, sizeof(table_bucket_t));
     set->insert_loops = 0;
     set->expansions = 0;
@@ -58,7 +59,7 @@ static inline uint8_t unpackSubnetSize(table_bucket_t *bucket, size_t i)
 static inline uint8_t setPackedSubnetSize(table_bucket_t *bucket, size_t i, uint8_t val)
 {
     uint8_t insert_mask = val << ((i % 4) * 2);
-    uint8_t clear_mask = ~(0b00000011 << (i % 4));
+    uint8_t clear_mask = ~(0b00000011 << ((i % 4) * 2));
 
     bucket->packed_subnet_sizes[i / 4] &= clear_mask;
     bucket->packed_subnet_sizes[i / 4] |= insert_mask;
@@ -143,6 +144,7 @@ void addIPs(subnet_t *subnet, void *context)
     // try to put in primary bucket
     uint32_t adr_hash1 = hash1(subnet->address & TOP_HALF_MASK);
     table_bucket_t *bucket = set->table + (adr_hash1 % set->table_len);
+
     for (size_t i = 0; i < BUCKET_SIZE; i++)
     {
         // TODO: make this work with overlapping subnets that start with the same address
