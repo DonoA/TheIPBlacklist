@@ -2,3 +2,4 @@
 datasets/
 *.png
 .vscode/
+src/results.txt

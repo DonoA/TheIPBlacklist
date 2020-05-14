@@ -11,7 +11,7 @@ struct set_struct
     size_t size;
 };
 
-set_t *newSet(size_t _)
+set_t *newSet(size_t _, float __)
 {
     size_t ipRange = (1L << 32) - 1;
     set_t *set = profiledCalloc(1, sizeof(set_t));

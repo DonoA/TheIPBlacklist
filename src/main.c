@@ -17,7 +17,7 @@
 #define TEST_COUNT 100 * 1000 * 1000
 // #define TEST_COUNT 50
 // #define TEST_SIZE 10 * 1000 * 1000
-#define TEST_SIZE 10*1000 * 1000
+#define TEST_SIZE 10 * 1000 * 1000
 #define DEBUG true
 
 #define TEST_IP_START 16777217 // 1.0.0.1
@@ -37,7 +37,7 @@ size_t countIPs(vector_t *subnet_vector)
 
 void runTest()
 {
-    set_t *blocklist = newSet(TEST_SIZE/2);
+    set_t *blocklist = newSet(TEST_SIZE/2, 1.2);
 
     for (size_t i = 0; i < TEST_SIZE; i++)
     {
@@ -78,13 +78,13 @@ void runTest()
     setPrintExtraStats(blocklist);
 }
 
-void runProfiling(size_t totalIPs, vector_t *subnet_vector)
+void runProfiling(size_t totalIPs, vector_t *subnet_vector, float load_factor, size_t hit_rate)
 {
     clock_t start, stop;
     beingMemoryProfiling();
 
     start = clock();
-    set_t *blocklist = newSet(totalIPs);
+    set_t *blocklist = newSet(totalIPs, load_factor);
     for (size_t i = 0; i < subnet_vector->used; i++)
     {
         subnet_t *subnet = (subnet_t *)vectorGet(subnet_vector, i);
@@ -97,7 +97,13 @@ void runProfiling(size_t totalIPs, vector_t *subnet_vector)
     for (size_t i = 0; i < TEST_COUNT; i++)
     {
         uint32_t address;
-        bool hit = i % HIT_RATE == 0;
+        bool hit = i % hit_rate == 0;
+        // if (i % (TEST_COUNT/10) == 0)
+        // {
+        //     putchar('#');
+        //     fflush(stdout);
+        // }
+
         if (hit)
         {
             subnet_t *subnet = (subnet_t *)
@@ -151,7 +157,7 @@ int main(int argc, char *argv[])
     parseFile(subnet_vector, argv[1]);
     size_t totalIPs = countIPs(subnet_vector);
 
-    runProfiling(totalIPs, subnet_vector);
+    runProfiling(totalIPs, subnet_vector, 1.2, HIT_RATE);
 
     deleteVector(subnet_vector);
 

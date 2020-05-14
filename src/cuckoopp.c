@@ -26,10 +26,10 @@ struct set_struct
     size_t second_bucket_queries;
 };
 
-set_t *newSet(size_t len)
+set_t *newSet(size_t len, float load_factor)
 {
     set_t *set = profiledCalloc(1, sizeof(set_t));
-    set->table_len = ((float)(len * 1.1) / BUCKET_SIZE);
+    set->table_len = ((float)(len * load_factor) / BUCKET_SIZE);
     set->table = profiledCalloc(set->table_len, sizeof(table_bucket_t));
     set->insert_loops = 0;
     set->expansions = 0;

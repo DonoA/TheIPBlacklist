@@ -14,7 +14,7 @@ typedef struct {
 
 typedef struct set_struct set_t;
 
-set_t * newSet(size_t length);
+set_t * newSet(size_t length, float load_factor);
 void deleteSet(set_t * set);
 
 void setAddAll(set_t * set, subnet_t addresses);

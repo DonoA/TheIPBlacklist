@@ -16,9 +16,9 @@
 
 typedef struct
 {
-    uint32_t data[BUCKET_SIZE];              // 13*4 = 52
+    uint32_t data[BUCKET_SIZE];              // 14*4 = 56
     uint8_t packed_subnet_sizes[PACK_SIZE];  // 4 (Each subnet is 2 bits)
-    uint8_t filter[BLOOM_FILTER_SIZE];       // 8
+    uint8_t filter[BLOOM_FILTER_SIZE];       // 4
 } table_bucket_t;
 
 struct set_struct
@@ -33,11 +33,11 @@ struct set_struct
     size_t second_bucket_queries;
 };
 
-set_t *newSet(size_t len)
+set_t *newSet(size_t len, float load_factor)
 {
     static_assert(sizeof(table_bucket_t) == 64, "Bucket size should be cache line!");
     set_t *set = profiledCalloc(1, sizeof(set_t));
-    set->table_len = ((float)(len * 1.1) / BUCKET_SIZE);
+    set->table_len = ((float)(len * load_factor) / BUCKET_SIZE);
     set->table = profiledCalloc(set->table_len, sizeof(table_bucket_t));
     set->insert_loops = 0;
     set->expansions = 0;
