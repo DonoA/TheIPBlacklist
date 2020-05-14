@@ -41,12 +41,14 @@ void deleteSet(set_t *set)
 // https://github.com/skeeto/hash-prospector
 size_t hash(uint32_t x)
 {
-    x ^= x >> 16;
-    x *= UINT32_C(0x7feb352d);
+    x ^= x >> 17;
+    x *= UINT32_C(0xed5ad4bb);
+    x ^= x >> 11;
+    x *= UINT32_C(0xac4c1b51);
     x ^= x >> 15;
-    x *= UINT32_C(0x846ca68b);
-    x ^= x >> 16;
-    return x & 0xffffffff;
+    x *= UINT32_C(0x31848bab);
+    x ^= x >> 14;
+    return x;
 }
 
 void addIP(uint32_t address, void *context)

@@ -13,5 +13,8 @@ robinhood_test: main.c robinhood_hashing.c $(LIB)
 EBVBL_test: main.c EBVBL.c $(LIB)
 	gcc $(CFLAGS) -o $@ $^
 
+cuckoopp_test: main.c cuckoopp.c $(LIB)
+	gcc $(CFLAGS) -o $@ $^
+
 clean:
 	-rm *_test

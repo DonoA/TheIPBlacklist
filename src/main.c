@@ -13,10 +13,10 @@
 #include "blacklist.h"
 
 #define HIT_RATE 2
-// #define TEST_COUNT 50 * 1000 * 1000
-#define TEST_COUNT 50
-// #define TEST_SIZE 10 * 1000
-#define TEST_SIZE 10
+#define TEST_COUNT 50 * 1000 * 1000
+// #define TEST_COUNT 50
+#define TEST_SIZE 1 * 1000 * 1000
+// #define TEST_SIZE 20
 #define DEBUG true
 
 size_t countIPs(vector_t *subnet_vector)
@@ -33,40 +33,30 @@ size_t countIPs(vector_t *subnet_vector)
 
 void runTest()
 {
-    set_t *blocklist = newSet(TEST_SIZE);
+    set_t *blocklist = newSet(TEST_SIZE/2);
     size_t r = 1;
     for (size_t i = 0; i < TEST_SIZE; i++)
     {
-        r = (r * 12345);
-        uint32_t address = (r | 0x11111111) & 0xff00ff00;
+        if(r > (1 << 31))
+        {
+            printf("Too many IPs!\n");
+            exit(1);
+        }
 
         subnet_t subnet;
-        subnet.address = address;
+        subnet.address = i + 1;
         subnet.sig_bits = 32;
-
-        setAddAll(blocklist, subnet);
+        bool hit = i % HIT_RATE == 0;
+        if(hit)
+        {
+            setAddAll(blocklist, subnet);
+        }
     }
 
-    for (size_t i = 0; i < TEST_COUNT; i++)
+    for (size_t i = 0; i < TEST_SIZE; i++)
     {
-        if ((i * 2) % TEST_SIZE == 0)
-        {
-            r = 1;
-        }
-
-        uint32_t address;
         bool hit = i % HIT_RATE == 0;
-
-        if (hit)
-        {
-            r = (r * 12345);
-            address = (r | 0x11111111) & 0xff00ff00;
-        }
-        else
-        {
-            address = (r | 0x11111111) & 0x00ff00ff;
-        }
-
+        uint32_t address = i + 1;
         bool blocked = setContains(blocklist, address);
 
         if (blocked != hit)
@@ -78,7 +68,7 @@ void runTest()
             exit(EXIT_FAILURE);
         }
     }
-    printf("[PASSED] TEST_COUNT = %u, HIT_RATE = %u, IPs = %u\n", TEST_COUNT, HIT_RATE, TEST_SIZE);
+    printf("[PASSED] TEST_COUNT = %u, HIT_RATE = %u, IPs = %u\n", TEST_SIZE, HIT_RATE, TEST_SIZE);
 
     setPrintExtraStats(blocklist);
 }
