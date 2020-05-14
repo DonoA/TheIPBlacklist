@@ -12,7 +12,8 @@
 
 #include "blacklist.h"
 
-#define HIT_RATE 2
+// Higher is fewer hits
+#define HIT_RATE 10
 #define TEST_COUNT 50 * 1000 * 1000
 // #define TEST_COUNT 50
 // #define TEST_SIZE 10 * 1000 * 1000
