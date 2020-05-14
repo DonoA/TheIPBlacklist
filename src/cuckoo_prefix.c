@@ -263,7 +263,7 @@ bool setContains(set_t *set, uint32_t address)
         }
 
         uint8_t subnet_size = (*subnet_size_seg >> ((i % 4) * 2)) & 0b00000011;
-        if ((bucket->data[i] >> subnet_size) == (address >> subnet_size))
+        if (((bucket->data[i] - address) >> subnet_size) == 0)
         {
             return true;
         }
@@ -298,7 +298,7 @@ bool setContains(set_t *set, uint32_t address)
         }
 
         uint8_t subnet_size = (*subnet_size_seg >> ((i % 4) * 2)) & 0b00000011;
-        if ((bucket->data[i] >> subnet_size) == (address >> subnet_size))
+        if (((bucket->data[i] - address) >> subnet_size) == 0)
         {
             set->second_bucket_hits++;
             return true;
