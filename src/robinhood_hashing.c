@@ -17,10 +17,10 @@ struct set_struct
     size_t search_over_cache_line;
 };
 
-set_t *newSet(size_t len)
+set_t *newSet(size_t len, float load_factor)
 {
     set_t *set = profiledCalloc(1, sizeof(set_t));
-    set->table_len = len * 1.3;
+    set->table_len = len * load_factor;
     set->table_used = 0;
     set->table = profiledCalloc(set->table_len, sizeof(uint32_t));
     set->max_dist = 0;

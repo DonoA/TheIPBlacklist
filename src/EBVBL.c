@@ -62,7 +62,7 @@ void addIP(uint32_t address, void *context)
     uint32_t masked_address = address >> INSIG_BITS;
     size_t offset = masked_address / BLOCK_LEN;
     uint8_t *seg = set->bloom_filter + offset;
-    size_t mask = 1 << (masked_address % BLOCK_LEN);
+    uint8_t mask = 1 << (masked_address % BLOCK_LEN);
     if ((*seg & mask) == 0)
     {
         set->size++;

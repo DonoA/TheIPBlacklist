@@ -37,7 +37,7 @@ set_t *newSet(size_t len, float load_factor)
 {
     static_assert(sizeof(table_bucket_t) == 64, "Bucket size should be cache line!");
     set_t *set = profiledCalloc(1, sizeof(set_t));
-    set->table_len = ((float)(len * load_factor) / BUCKET_SIZE);
+    set->table_len = ((float)(len * 0.1) / BUCKET_SIZE);
     set->table = profiledCalloc(set->table_len, sizeof(table_bucket_t));
     set->insert_loops = 0;
     set->expansions = 0;
@@ -72,7 +72,7 @@ void expand(set_t *set)
     table_bucket_t *old_buckets = set->table;
     size_t old_table_len = set->table_len;
 
-    set->table_len = (set->table_len * EXPAND_FACTOR_MOD) + 1;
+    set->table_len = (set->table_len * 1.05) + 1;
     set->insert_loops = 0;
     set->table = profiledCalloc(set->table_len, sizeof(table_bucket_t));
     set->expansions++;
