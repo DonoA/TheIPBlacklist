@@ -59,5 +59,5 @@ size_t setGetSize(set_t *set)
 
 void setPrintExtraStats(set_t * set)
 {
-    
+    printf("Implementation = Bitset\n");
 }

@@ -1,4 +1,4 @@
-CFLAGS = -g -O3
+CFLAGS = -g -std=gnu11
 LIB = lib/*.c
 
 linear_probe_test: main.c linear_probe.c $(LIB)

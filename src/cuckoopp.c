@@ -241,6 +241,7 @@ void setPrintExtraStats(set_t *set)
 {
     size_t size = setGetSize(set);
 
+    printf("Implementation = Cuckoo++\n");
     printf("Expansions = %lu, load factor = %f\n", set->expansions, (float)size / (set->table_len * BUCKET_SIZE));
     printf("Second Bucket Queries = %lu, Second bucket hits = %lu\n", set->second_bucket_queries, set->second_bucket_hits);
     printf("Bloom filter misses = %lu\n", set->bloom_filter_misses);

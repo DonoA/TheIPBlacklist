@@ -150,6 +150,8 @@ size_t setGetSize(set_t *set)
 
 void setPrintExtraStats(set_t * set)
 {
+    printf("Implementation = Robinhood Hashing\n");
+    printf("load factor = %f\n", (float)set->table_used / (set->table_len));
     printf("Average Search Dist = %f\n", ((double) set->total_search_dist/set->search_count));
     printf("Searches over 16 elts = %lu\n", set->search_over_cache_line - set->search_count);
 }

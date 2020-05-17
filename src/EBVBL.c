@@ -65,7 +65,6 @@ void addIP(uint32_t address, void *context)
     uint8_t mask = 1 << (masked_address % BLOCK_LEN);
     if ((*seg & mask) == 0)
     {
-        set->size++;
         *seg |= mask;
     }
 
@@ -153,11 +152,13 @@ bool setContains(set_t *set, uint32_t address)
 
 size_t setGetSize(set_t *set)
 {
-    return set->size;
+    return set->table_used;
 }
 
 void setPrintExtraStats(set_t * set)
 {
+    printf("Implementation = EBVBL\n");
+    printf("load factor = %f\n", (float)set->table_used / (set->table_len));
     printf("Average Search Dist = %f\n", ((double) set->total_search_dist/set->search_count));
     printf("Searches over 16 elts = %lu\n", set->search_over_cache_line - set->search_count);
 }

@@ -52,8 +52,8 @@ void deleteSet(set_t *set)
 
 static inline uint8_t unpackSubnetSize(table_bucket_t *bucket, size_t i)
 {
-    uint8_t subnet_size_mask = 0b00000011 << (i % 4);
-    return bucket->packed_subnet_sizes[i / 4] & subnet_size_mask;
+    uint8_t subnet_size = (bucket->packed_subnet_sizes[i / 4] >> ((i % 4) * 2)) & 0b00000011;
+    return subnet_size;
 }
 
 static inline uint8_t setPackedSubnetSize(table_bucket_t *bucket, size_t i, uint8_t val)
@@ -325,24 +325,30 @@ size_t setGetSize(set_t *set)
         {
             if (set->table[i].data[j] != EMPTY)
             {
-                // putchar('#');
-                size++;
-            }
-            else
-            {
-                // putchar('-');
+                // uint8_t subnet_size = (set->table[i].packed_subnet_sizes[j / 4] >> ((j % 4) * 2)) & 0b00000011;
+                size += (1 << unpackSubnetSize(&set->table[i], j));
             }
         }
     }
-    // putchar('\n');
     return size;
 }
 
 void setPrintExtraStats(set_t *set)
 {
-    size_t size = setGetSize(set);
+    size_t size = 0;
+    for (size_t i = 0; i < set->table_len; i++)
+    {
+        for (size_t j = 0; j < BUCKET_SIZE; j++)
+        {
+            if (set->table[i].data[j] != EMPTY)
+            {
+                size++;
+            }
+        }
+    }
 
+    printf("Implementation = Cuckoo Prefix\n");
     printf("Expansions = %lu, load factor = %f\n", set->expansions, (float)size / (set->table_len * BUCKET_SIZE));
     printf("Second Bucket Queries = %lu, Second bucket hits = %lu\n", set->second_bucket_queries, set->second_bucket_hits);
-    printf("Bloom filter misses = %lu\n", set->bloom_filter_misses);
+    printf("Bloom filter misses = %lu, Bucket Size = %u\n", set->bloom_filter_misses, BUCKET_SIZE);
 }

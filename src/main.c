@@ -78,17 +78,32 @@ void runTest()
     setPrintExtraStats(blocklist);
 }
 
-void runProfiling(size_t totalIPs, vector_t *subnet_vector, float load_factor, size_t hit_rate)
+void runProfiling(size_t size, vector_t *subnet_vector, float load_factor, size_t hit_rate)
 {
     clock_t start, stop;
     beingMemoryProfiling();
-
+    
     start = clock();
-    set_t *blocklist = newSet(totalIPs, load_factor);
-    for (size_t i = 0; i < subnet_vector->used; i++)
+    set_t *blocklist = newSet(size, load_factor);
+    size_t current_size = 0;
+    for (size_t i = 0; i < subnet_vector->used && current_size + 16 < size; i++)
     {
-        subnet_t *subnet = (subnet_t *)vectorGet(subnet_vector, i);
-        setAddAll(blocklist, *subnet);
+        subnet_t subnet = *(subnet_t *)vectorGet(subnet_vector, i);
+        size_t subnet_size = 1L << (32 - subnet.sig_bits);
+        if(current_size + subnet_size > size)
+        {
+            size_t insig_bits = 32;
+            do
+            {
+                insig_bits--;
+                subnet_size = 1L << insig_bits;
+            }
+            while(current_size + subnet_size > size);
+
+            subnet.sig_bits = (32 - insig_bits);
+        }
+        current_size += subnet_size;
+        setAddAll(blocklist, subnet);
     }
     stop = clock();
     double setup_time = (double)(stop - start) / CLOCKS_PER_SEC;
@@ -128,11 +143,13 @@ void runProfiling(size_t totalIPs, vector_t *subnet_vector, float load_factor, s
     stop = clock();
     double test_time = (double)(stop - start) / CLOCKS_PER_SEC;
 
-    printf("[PASSED] TEST_COUNT = %u, HIT_RATE = %u, IPs = %lu\n", TEST_COUNT, HIT_RATE, totalIPs);
+    printf("[PASSED] TEST_COUNT = %u, HIT_RATE = %u, IPs = %lu\n", TEST_COUNT, HIT_RATE, size);
     size_t allocated, freed;
     endProfiling(&allocated, &freed);
-    printf("[PASSED] allocated (Bytes) = %lu, freed (Bytes) = %lu, diff = %lu (Bytes), set size = %lu\n", allocated, freed, allocated - freed, setGetSize(blocklist));
-    printf("[PASSED] setup time = %f (s), test_time = %f (s)\n", setup_time, test_time);
+    printf("[PASSED] allocated (Bytes), freed (Bytes), diff (Bytes), set size\n");
+    printf("[PASSED] %lu, %lu, %lu, %lu\n", allocated, freed, allocated - freed, setGetSize(blocklist));
+    printf("[PASSED] setup time (s), test_time (s)\n");
+    printf("[PASSED] %f, %f\n", setup_time, test_time);
 
     setPrintExtraStats(blocklist);
 
@@ -155,9 +172,19 @@ int main(int argc, char *argv[])
 
     vector_t *subnet_vector = newVector(sizeof(subnet_t));
     parseFile(subnet_vector, argv[1]);
-    size_t totalIPs = countIPs(subnet_vector);
 
-    runProfiling(totalIPs, subnet_vector, 1.2, HIT_RATE);
+    size_t max_ips = countIPs(subnet_vector);
+    for (size_t target_size = 1000; (target_size) < max_ips; target_size *= 10)
+    {
+        printf("==================================================\n");
+        runProfiling(target_size, subnet_vector, 1.2, HIT_RATE);
+
+        if(target_size * 5 < max_ips)
+        {
+            printf("==================================================\n");
+            runProfiling(target_size*5, subnet_vector, 1.2, HIT_RATE);
+        }
+    }
 
     deleteVector(subnet_vector);
 
