@@ -37,7 +37,24 @@ size_t countIPs(vector_t *subnet_vector)
 
 void runTest()
 {
-    set_t *blocklist = newSet(TEST_SIZE/2, 1.2);
+    set_t *blocklist = newSet(256, 1.2);
+    subnet_t subnet;
+    subnet.address = addressAsInt("192.168.0.0");
+    subnet.sig_bits = 24;
+
+    setAddAll(blocklist, subnet);
+
+    for(size_t i = 0; i < 256; i += 2)
+    {
+        bool contains = setContains(blocklist, subnet.address+i);
+        assert(contains);
+
+        contains = setContains(blocklist, subnet.address+512+i);
+        assert(!contains);
+    }
+    deleteSet(blocklist);
+
+    blocklist = newSet(TEST_SIZE/2, 1.2);
 
     for (size_t i = 0; i < TEST_SIZE; i++)
     {

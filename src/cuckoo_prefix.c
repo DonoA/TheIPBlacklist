@@ -12,7 +12,7 @@
 #define PACK_SIZE ((BUCKET_SIZE + 3) / 4)
 #define BLOOM_FILTER_SIZE (64 - (BUCKET_SIZE * 4 + PACK_SIZE))
 #define MAX_LOOPS 16
-#define TOP_HALF_MASK 0xfffffff0
+#define TOP_HALF_MASK 0xfffffff8
 
 typedef struct
 {
@@ -265,7 +265,7 @@ bool setContains(set_t *set, uint32_t address)
         }
 
         uint8_t subnet_size = (*subnet_size_seg >> ((i % 4) * 2)) & 0b00000011;
-        if (((bucket->data[i] - address) >> subnet_size) == 0)
+        if (((address - bucket->data[i]) >> subnet_size) == 0)
         {
             return true;
         }
@@ -300,7 +300,7 @@ bool setContains(set_t *set, uint32_t address)
         }
 
         uint8_t subnet_size = (*subnet_size_seg >> ((i % 4) * 2)) & 0b00000011;
-        if (((bucket->data[i] - address) >> subnet_size) == 0)
+        if (((address - bucket->data[i]) >> subnet_size) == 0)
         {
             set->second_bucket_hits++;
             return true;
